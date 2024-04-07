@@ -11,5 +11,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Route {
     String path() default "";
+
     HttpOpCode opCode() default HttpOpCode.GET;
 }

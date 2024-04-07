@@ -4,12 +4,14 @@ import net.phoenix.http.container.HttpRequest;
 
 import java.util.HashMap;
 
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class HttpRequestBuilder {
     private HashMap<String, String> headers;
     private String method;
     private String path;
     private String body;
     private HashMap<String, String> params;
+    private String ip;
 
 
     public HttpRequestBuilder() {
@@ -56,7 +58,12 @@ public class HttpRequestBuilder {
         return this;
     }
 
+    public HttpRequestBuilder setIp(String ip) {
+        this.ip = ip;
+        return this;
+    }
+
     public HttpRequest build() {
-        return new HttpRequest(headers, method, path, body, params);
+        return new HttpRequest(headers, method, path, body, params, ip);
     }
 }

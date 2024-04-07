@@ -19,11 +19,12 @@ public class Logger {
         this(out, Thread.currentThread().getName(), new File("./logs/" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(" ", "-").replace(",", "").toLowerCase() + ".log"), new File("./logs/access-log-" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(",", "").replace(" ", "-").toLowerCase() + ".log"));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public Logger(PrintStream out, String threadName, File logFile, File accessLogs) {
         this.out = out;
         this.threadName = threadName;
         try {
-            if(logFile.exists()) {
+            if (logFile.exists()) {
                 int i = 1;
                 while (logFile.exists()) {
                     logFile = new File("./logs/" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(" ", "-").replace(",", "").toLowerCase() + "-" + i + ".log");
@@ -41,7 +42,7 @@ public class Logger {
             throw new RuntimeException(e);
         }
         try {
-            if(accessLogs.exists()) {
+            if (accessLogs.exists()) {
                 int i = 1;
                 while (accessLogs.exists()) {
                     accessLogs = new File("./logs/access-" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(" ", "-").replace(",", "").toLowerCase() + "-" + i + ".log");
@@ -87,12 +88,13 @@ public class Logger {
         new Log(Priority.ERROR, e.getMessage(), threadName).send(out, logFile);
     }
 
-    public void logCustom(Log log) {
-        log.send(out, logFile);
+    public void logConnection(String ip, String path) {
+        new Log(Priority.INFO, "Connection from " + ip + " to " + path, "server-thread").send(accessLogs);
     }
 
-    public void logConnection(String ip, String path) {
-        new Log(Priority.INFO, "Connection from " + ip + " to " + path, "connections").send(accessLogs);
+    public void shutdown() {
+        logFile.close();
+        accessLogs.close();
     }
 
 }

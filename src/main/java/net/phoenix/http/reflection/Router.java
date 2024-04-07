@@ -1,25 +1,23 @@
 package net.phoenix.http.reflection;
 
+import net.phoenix.Server;
+
 import java.io.File;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Router {
 
     private final static Map<String, Method> routes = new HashMap<>();
 
-    public static void generateRoutes() throws IOException, URISyntaxException, ClassNotFoundException {
-        List<Class<?>> scannedClasses = scanForAnnotation(Webhandler.class);
+    public static void generateRoutes() throws URISyntaxException, ClassNotFoundException {
+        List<Class<?>> scannedClasses = scanForAnnotation(WebHandler.class);
         for (Class<?> clazz : scannedClasses) {
-            Webhandler annotation = clazz.getAnnotation(Webhandler.class);
+            WebHandler annotation = clazz.getAnnotation(WebHandler.class);
             String path = annotation.path();
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
@@ -35,12 +33,13 @@ public class Router {
     public static Map<String, Method> getRoutes() {
         return routes;
     }
+
     public static Method route(String opCode, String path) {
-        return routes.get(opCode.concat(path));
+        return routes.get(opCode.concat(" ").concat(path));
     }
 
     private static void addRoute(final String opCode, final String route, final Method runner) {
-        routes.put(opCode.concat(route), runner);
+        routes.put(opCode.concat(" ").concat(route), runner);
     }
 
     public static List<Class<?>> scanForAnnotation(Class<? extends Annotation> annotationClass) {
@@ -54,7 +53,7 @@ public class Router {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Server.logger.logError("Failed to scan for classes due to: " + e.getMessage());
         }
 
         return classes;
@@ -77,7 +76,7 @@ public class Router {
     }
 
     private static class ClassFinder extends ClassLoader {
-        private String classpathEntry;
+        private final String classpathEntry;
 
         ClassFinder(String classpathEntry, ClassLoader parent) {
             super(parent);
@@ -88,14 +87,15 @@ public class Router {
             int count = 0;
             Class<?>[] classes = new Class<?>[1000];
             URL url = new java.io.File(classpathEntry).toURI().toURL();
-            URLClassLoader cl = new URLClassLoader(new java.net.URL[]{url}, this.getParent());
-            File dir = new java.io.File(classpathEntry);
-            if (dir.exists() && dir.isDirectory()) {
-                for (java.io.File file : dir.listFiles()) {
-                    if (file.isFile() && file.getName().endsWith(".class")) {
-                        String className = file.getName().substring(0, file.getName().length() - 6);
-                        Class<?> clazz = cl.loadClass(className);
-                        classes[count++] = clazz;
+            try (URLClassLoader cl = new URLClassLoader(new URL[]{url}, this.getParent())) {
+                File dir = new java.io.File(classpathEntry);
+                if (dir.exists() && dir.isDirectory()) {
+                    for (java.io.File file : Objects.requireNonNull(dir.listFiles())) {
+                        if (file.isFile() && file.getName().endsWith(".class")) {
+                            String className = file.getName().substring(0, file.getName().length() - 6);
+                            Class<?> clazz = cl.loadClass(className);
+                            classes[count++] = clazz;
+                        }
                     }
                 }
             }

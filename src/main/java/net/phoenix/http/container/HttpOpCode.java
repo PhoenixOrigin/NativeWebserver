@@ -1,5 +1,6 @@
 package net.phoenix.http.container;
 
+@SuppressWarnings("unused")
 public enum HttpOpCode {
     GET,
     POST,
@@ -11,14 +12,8 @@ public enum HttpOpCode {
     TRACE,
     CONNECT;
 
-    private final String method;
-
-    HttpOpCode() {
-        this.method = this.name();
-    }
-
     @Override
     public String toString() {
-        return method;
+        return this.name();
     }
 }
