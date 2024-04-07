@@ -11,8 +11,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Represents an HTTP response.
+ */
 public record HttpResponse(Map<String, List<String>> responseHeaders, int statusCode, Optional<Object> entity) {
 
+    /**
+     * Internally builds the header strings for the response.
+     * @param responseHeaders The headers to build
+     * @return A list of strings representing the headers
+     */
     private static List<String> buildHeaderStrings(final Map<String, List<String>> responseHeaders) {
         final List<String> responseHeadersList = new ArrayList<>();
 
@@ -27,6 +35,11 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
         return responseHeadersList;
     }
 
+    /**
+     * Gets the body of the response. If it is a string, it will be written directly with the headers. If it is an InputStream, it will be written separately.
+     * @param entity The entity to get the response string from
+     * @return The body string
+     */
     private static Optional<String> getResponseString(final Object entity) {
         if (entity instanceof String) {
             try {
@@ -37,9 +50,16 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
         return Optional.empty();
     }
 
+    /**
+     * Writes the InputStream to the channel. This will be done in buffers of 2048 bytes. The InputStream will be closed after writing.
+     * @param channel The socket connection to write the InputStream to
+     * @throws IOException If an I/O error occurs
+     * @throws ExecutionException If an exception occurs during execution
+     * @throws InterruptedException If the current thread is interrupted
+     */
     public void writeInputStream(final AsynchronousSocketChannel channel) throws IOException, ExecutionException, InterruptedException {
         if (entity.isPresent() && entity.get() instanceof InputStream entityStream) {
-            final byte[] buffer = new byte[1024];
+            final byte[] buffer = new byte[2048];
             int bytesRead;
             while ((bytesRead = entityStream.read(buffer)) != -1) {
                 channel.write(ByteBuffer.wrap(buffer, 0, bytesRead)).get();
@@ -48,6 +68,10 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
         }
     }
 
+    /**
+     * Gets the status code of the response. This method should not be used by the end user UNLESS they are overriding the toString method.
+     * @return The status code
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

@@ -14,15 +14,23 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.Objects;
 
+/**
+ * A class that processes incoming HTTP requests.
+ */
 public class IncomingRequest {
 
+    /**
+     * Processes an incoming HTTP request. This method should not be called, edited, or otherwise used or modified by the end user in any situation.
+     * @param request The request to process
+     * @return The response to send back to the client
+     */
     public static HttpResponse processRequest(HttpRequest request) {
         try {
             if (request.path().contains("..")) {
                 Server.logger.logError("Illegal path traversal containing \"../\" detected from " + request.ip());
                 return getError(403).build();
             }
-            Method runner = Router.route(request.method(), request.path().split("\\?")[0]);
+            Method runner = Router.route(request.method().toString(), request.path().split("\\?")[0]);
             Server.logger.logConnection(request.ip(), request.path());
             HttpResponse response;
             if (runner != null) {
@@ -58,6 +66,11 @@ public class IncomingRequest {
         }
     }
 
+    /**
+     * Gets an error response with the specified status code. This method checks if the error page exists in the resources folder, and if it does not, it will return a erorr code with no entity.
+     * @param code The status code to get the error response for
+     * @return The error response
+     */
     @SuppressWarnings("StringEquality")
     private static HttpResponseBuilder getError(int code) {
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
@@ -74,6 +87,13 @@ public class IncomingRequest {
         return responseBuilder;
     }
 
+    /**
+     * Gets a file from the resources folder.
+     * @param path The path to the file
+     * @return The response containing the file
+     * @throws IOException If an I/O error occurs
+     * @throws NullPointerException If the file does not exist
+     */
     @SuppressWarnings("StringEquality")
     private static HttpResponse getFile(String path) throws IOException, NullPointerException {
         HttpResponse response;

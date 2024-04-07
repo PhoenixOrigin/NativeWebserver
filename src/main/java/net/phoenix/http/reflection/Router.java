@@ -3,6 +3,7 @@ package net.phoenix.http.reflection;
 import net.phoenix.Server;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
@@ -10,10 +11,18 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
+/**
+ * A class that generates routes and routes incoming requests to the correct method.
+ */
 public class Router {
 
     private final static Map<String, Method> routes = new HashMap<>();
 
+    /**
+     * Generates routes for the server to use. This method should not be called, edited, or otherwise used or modified by the end user in any situation.
+     * @throws URISyntaxException If the URI is invalid
+     * @throws ClassNotFoundException If the class is not found
+     */
     public static void generateRoutes() throws URISyntaxException, ClassNotFoundException {
         List<Class<?>> scannedClasses = scanForAnnotation(WebHandler.class);
         for (Class<?> clazz : scannedClasses) {
@@ -30,18 +39,39 @@ public class Router {
         }
     }
 
+    /**
+     * Gets the routes that have been generated.
+     * @return The routes that have been generated
+     */
     public static Map<String, Method> getRoutes() {
         return routes;
     }
 
+    /**
+     * Routes an incoming request to the correct method.
+     * @param opCode The HTTP method of the request
+     * @param path The path of the request
+     * @return The method to run
+     */
     public static Method route(String opCode, String path) {
         return routes.get(opCode.concat(" ").concat(path));
     }
 
+    /**
+     * Adds a route to the server.
+     * @param opCode The HTTP method of the route
+     * @param route The path of the route
+     * @param runner The method to run when a request is recieved
+     */
     private static void addRoute(final String opCode, final String route, final Method runner) {
         routes.put(opCode.concat(" ").concat(route), runner);
     }
 
+    /**
+     * Scans for classes with the specified annotation.
+     * @param annotationClass The annotation to scan for
+     * @return A list of classes with the specified annotation
+     */
     public static List<Class<?>> scanForAnnotation(Class<? extends Annotation> annotationClass) {
         List<Class<?>> classes = new ArrayList<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -59,7 +89,14 @@ public class Router {
         return classes;
     }
 
-    private static Class<?>[] getAllClasses(ClassLoader classLoader) throws Exception {
+    /**
+     * Gets all classes in the classpath.
+     * @param classLoader The class loader to use
+     * @return An array of all classes in the classpath
+     * @throws IOException If an I/O error occurs
+     * @throws ClassNotFoundException If the class is not found
+     */
+    private static Class<?>[] getAllClasses(ClassLoader classLoader) throws IOException, ClassNotFoundException {
         String[] classpathEntries = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
         int count = 0;
         Class<?>[] classes = new Class<?>[1000];
@@ -75,15 +112,28 @@ public class Router {
         return result;
     }
 
+    /**
+     * A class that helps find classes in the classpath.
+     */
     private static class ClassFinder extends ClassLoader {
         private final String classpathEntry;
 
+        /**
+         * Creates a new ClassFinder.
+         * @param classpathEntry The classpath entry to search
+         * @param parent The parent class loader
+         */
         ClassFinder(String classpathEntry, ClassLoader parent) {
             super(parent);
             this.classpathEntry = classpathEntry;
         }
 
-        Class<?>[] getClasses() throws Exception {
+        /**
+         * Gets all classes in the classpath.
+         * @return An array of all classes in the classpath
+         * @throws Exception If an exception occurs
+         */
+        Class<?>[] getClasses() throws IOException, ClassNotFoundException {
             int count = 0;
             Class<?>[] classes = new Class<?>[1000];
             URL url = new java.io.File(classpathEntry).toURI().toURL();

@@ -10,7 +10,17 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A class that handles incoming requests from the socket. This class is for internal use and should not be modified or used by the end user.
+ */
 public class RequestHandler implements CompletionHandler<AsynchronousSocketChannel, Object> {
+    /**
+     * Invoked when a connection is established and ready to accept I/O operations.
+     * @param result
+     *          The result of the I/O operation.
+     * @param attachment
+     *          The object attached to the I/O operation when it was initiated.
+     */
     @Override
     public void completed(AsynchronousSocketChannel result, Object attachment) {
         if (Server.socket.isOpen()) {
@@ -18,6 +28,13 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
         }
         ByteBuffer buffer = ByteBuffer.allocate(1024);
         result.read(buffer, null, new CompletionHandler<>() {
+            /**
+             * Process the incoming data that has completed
+             * @param r
+             *          The result of the I/O operation.
+             * @param attachment
+             *          The object attached to the I/O operation when it was initiated.
+             */
             @Override
             public void completed(Integer r, Object attachment) {
                 buffer.flip();
@@ -48,6 +65,13 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
                 }
             }
 
+            /**
+             * Invoked when an I/O operation fails.
+             * @param exc
+             *          The exception that caused the I/O operation to fail.
+             * @param attachment
+             *          The object attached to the I/O operation when it was initiated.
+             */
             @Override
             public void failed(Throwable exc, Object attachment) {
                 Server.logger.logError("Failed to read request from client due to: " + exc.getMessage());
@@ -55,6 +79,13 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
         });
     }
 
+    /**
+     * Invoked when an I/O operation fails.
+     * @param exc
+     *          The exception that caused the I/O operation to fail.
+     * @param attachment
+     *          The object attached to the I/O operation when it was initiated.
+     */
     @Override
     public void failed(Throwable exc, Object attachment) {
         Server.logger.logError("Failed to accept connection due to: " + exc.getMessage());
