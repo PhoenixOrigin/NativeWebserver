@@ -1,5 +1,8 @@
 package net.phoenix.http.container;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -12,7 +15,7 @@ public class HttpResponse {
 
     private final Optional<Object> entity;
 
-    private HttpResponse(final Map<String, List<String>> responseHeaders, final int statusCode, final Optional<Object> entity) {
+    public HttpResponse(final Map<String, List<String>> responseHeaders, final int statusCode, final Optional<Object> entity) {
         this.responseHeaders = responseHeaders;
         this.statusCode = statusCode;
         this.entity = entity;
@@ -52,6 +55,17 @@ public class HttpResponse {
         return Optional.empty();
     }
 
+    public void writeInputStream(final OutputStream outputStream) throws IOException {
+        if (entity.isPresent() && entity.get() instanceof InputStream entityStream) {
+            final byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = entityStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            entityStream.close();
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -79,51 +93,5 @@ public class HttpResponse {
         }
 
         return sb.toString();
-    }
-
-    public static class HttpStatusCode {
-
-        public static final Map<Integer, String> STATUS_CODES = Map.of(
-                200, "OK",
-                400, "BAD_REQUEST",
-                404, "NOT_FOUND",
-                500, "INTERNAL_SERVER_ERROR"
-        );
-    }
-
-    public static class Builder {
-        private final Map<String, List<String>> responseHeaders;
-        private int statusCode;
-
-        private Optional<Object> entity;
-
-        public Builder() {
-            responseHeaders = new HashMap<>();
-            responseHeaders.put("Server", List.of("localhost"));
-            responseHeaders.put("Date", List.of(DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC))));
-
-            entity = Optional.empty();
-        }
-
-        public Builder setStatusCode(final int statusCode) {
-            this.statusCode = statusCode;
-            return this;
-        }
-
-        public Builder addHeader(final String name, final String value) {
-            responseHeaders.put(name, List.of(value));
-            return this;
-        }
-
-        public Builder setEntity(final Object entity) {
-            if (entity != null) {
-                this.entity = Optional.of(entity);
-            }
-            return this;
-        }
-
-        public HttpResponse build() {
-            return new HttpResponse(responseHeaders, statusCode, entity);
-        }
     }
 }

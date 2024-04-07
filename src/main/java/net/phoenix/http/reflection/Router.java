@@ -1,68 +1,113 @@
 package net.phoenix.http.reflection;
 
 import net.phoenix.http.Server;
+import net.phoenix.http.builder.HttpResponseBuilder;
+import net.phoenix.http.container.HttpResponse;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Router {
 
-    public static void generateRoutes() throws IOException, URISyntaxException, ClassNotFoundException {
-        Iterable<Class> classes = getClasses("net.phoenix");
+    private final static Map<String, Method> routes = new HashMap<>();
 
-        for (Class clazz : classes) {
-            if (clazz.isAnnotationPresent(Webhandler.class)) {
-                Webhandler webhandler = (Webhandler) clazz.getAnnotation(Webhandler.class);
-                for(Method method : clazz.getDeclaredMethods()) {
-                    if (method.isAnnotationPresent(Route.class)) {
-                        Route route = method.getAnnotation(Route.class);
-                        Server.addRoute(route.method(), webhandler.path().concat(route.path()), method);
-                    }
+    public static void generateRoutes() throws IOException, URISyntaxException, ClassNotFoundException {
+        List<Class<?>> scannedClasses = scanForAnnotation(Webhandler.class);
+        for (Class<?> clazz : scannedClasses) {
+            Webhandler annotation = clazz.getAnnotation(Webhandler.class);
+            String path = annotation.path();
+            Method[] methods = clazz.getDeclaredMethods();
+            for (Method method : methods) {
+                Route routeAnnotation = method.getAnnotation(Route.class);
+                if (routeAnnotation != null) {
+                    String routePath = path + routeAnnotation.path();
+                    addRoute(routeAnnotation.opCode().toString(), routePath, method);
                 }
             }
         }
     }
 
-    private static Iterable<Class> getClasses(String packageName) throws IOException, URISyntaxException, ClassNotFoundException {
+    public static Method route(String opCode, String path) {
+        return routes.get(opCode.concat(path));
+    }
+
+    private static void addRoute(final String opCode, final String route, final Method runner) {
+        routes.put(opCode.concat(route), runner);
+    }
+
+    public static List<Class<?>> scanForAnnotation(Class<? extends Annotation> annotationClass) {
+        List<Class<?>> classes = new ArrayList<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        String path = packageName.replace('.', '/');
-        Enumeration<URL> resources = classLoader.getResources(path);
-        List<File> dirs = new ArrayList<File>();
-        while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            URI uri = new URI(resource.toString());
-            dirs.add(new File(uri.getPath()));
-        }
-        List<Class> classes = new ArrayList<Class>();
-        for (File directory : dirs) {
-            classes.addAll(findClasses(directory, packageName));
+        try {
+            Class<?>[] allClasses = getAllClasses(classLoader);
+            for (Class<?> clazz : allClasses) {
+                if (clazz.isAnnotationPresent(annotationClass)) {
+                    classes.add(clazz);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return classes;
     }
 
-    private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-        List<Class> classes = new ArrayList<Class>();
-        if (!directory.exists()) {
-            return classes;
-        }
-        File[] files = directory.listFiles();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            }
-            else if (file.getName().endsWith(".class")) {
-                classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+    private static Class<?>[] getAllClasses(ClassLoader classLoader) throws Exception {
+        String[] classpathEntries = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
+        int count = 0;
+        Class<?>[] classes = new Class<?>[1000];
+        for (String classpathEntry : classpathEntries) {
+            ClassFinder finder = new ClassFinder(classpathEntry, classLoader);
+            Class<?>[] foundClasses = finder.getClasses();
+            for (Class<?> clazz : foundClasses) {
+                classes[count++] = clazz;
             }
         }
-        return classes;
+        Class<?>[] result = new Class<?>[count];
+        System.arraycopy(classes, 0, result, 0, count);
+        return result;
     }
+
+    private static class ClassFinder extends ClassLoader {
+        private String classpathEntry;
+
+        ClassFinder(String classpathEntry, ClassLoader parent) {
+            super(parent);
+            this.classpathEntry = classpathEntry;
+        }
+
+        Class<?>[] getClasses() throws Exception {
+            int count = 0;
+            Class<?>[] classes = new Class<?>[1000];
+            URL url = new java.io.File(classpathEntry).toURI().toURL();
+            URLClassLoader cl = new URLClassLoader(new java.net.URL[]{url}, this.getParent());
+            File dir = new java.io.File(classpathEntry);
+            if (dir.exists() && dir.isDirectory()) {
+                for (java.io.File file : dir.listFiles()) {
+                    if (file.isFile() && file.getName().endsWith(".class")) {
+                        String className = file.getName().substring(0, file.getName().length() - 6);
+                        Class<?> clazz = cl.loadClass(className);
+                        classes[count++] = clazz;
+                    }
+                }
+            }
+            Class<?>[] result = new Class<?>[count];
+            System.arraycopy(classes, 0, result, 0, count);
+            return result;
+        }
+    }
+
 
 }
