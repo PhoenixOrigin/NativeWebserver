@@ -1,19 +1,12 @@
 package net.phoenix.http.reflection;
 
-import net.phoenix.http.Server;
-import net.phoenix.http.builder.HttpResponseBuilder;
-import net.phoenix.http.container.HttpResponse;
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +32,9 @@ public class Router {
         }
     }
 
+    public static Map<String, Method> getRoutes() {
+        return routes;
+    }
     public static Method route(String opCode, String path) {
         return routes.get(opCode.concat(path));
     }
