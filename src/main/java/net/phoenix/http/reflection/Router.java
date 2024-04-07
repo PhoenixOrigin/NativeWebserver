@@ -61,7 +61,7 @@ public class Router {
      * Adds a route to the server.
      * @param opCode The HTTP method of the route
      * @param route The path of the route
-     * @param runner The method to run when a request is recieved
+     * @param runner The method to run when a request is received
      */
     private static void addRoute(final String opCode, final String route, final Method runner) {
         routes.put(opCode.concat(" ").concat(route), runner);
@@ -131,7 +131,8 @@ public class Router {
         /**
          * Gets all classes in the classpath.
          * @return An array of all classes in the classpath
-         * @throws Exception If an exception occurs
+         * @throws IOException If an I/O error occurs
+         * @throws ClassNotFoundException If the class is not found
          */
         Class<?>[] getClasses() throws IOException, ClassNotFoundException {
             int count = 0;

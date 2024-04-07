@@ -9,7 +9,7 @@ public record HttpStatusCode() {
     /**
      * A map of status codes to their corresponding messages.
      */
-    public static final Map<Integer, String> STATUS_CODES = Map.ofEntries(
+    public static final Map<Integer, String> STATUS_CODES = Map.<Integer, String>ofEntries(
             Map.entry(100, "Continue"),
             Map.entry(101, "Switching Protocols"),
             Map.entry(102, "Processing"),

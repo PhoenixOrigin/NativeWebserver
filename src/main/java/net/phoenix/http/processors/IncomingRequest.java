@@ -67,7 +67,7 @@ public class IncomingRequest {
     }
 
     /**
-     * Gets an error response with the specified status code. This method checks if the error page exists in the resources folder, and if it does not, it will return a erorr code with no entity.
+     * Gets an error response with the specified status code. This method checks if the error page exists in the resources folder, and if it does not, it will return an error code with no entity.
      * @param code The status code to get the error response for
      * @return The error response
      */
@@ -88,7 +88,7 @@ public class IncomingRequest {
     }
 
     /**
-     * Gets a file from the resources folder.
+     * Gets a file from the resources' folder.
      * @param path The path to the file
      * @return The response containing the file
      * @throws IOException If an I/O error occurs
