@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 src/test/java/
 src/test/resources/
+logs/
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
