@@ -1,4 +1,4 @@
-package net.phoenix.http.container;
+package net.phoenix.server.http.container;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,7 +74,7 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
     }
 
     /**
-     * Gets the status code of the response. This method should not be used by the end user UNLESS they are overriding the toString method.
+     * Gets the request as a string.
      *
      * @return The status code
      */

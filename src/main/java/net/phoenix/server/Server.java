@@ -1,11 +1,12 @@
-package net.phoenix;
+package net.phoenix.server;
 
-import net.phoenix.http.processors.RequestHandler;
-import net.phoenix.http.reflection.Router;
-import net.phoenix.logging.Logger;
+import net.phoenix.server.logging.Logger;
+import net.phoenix.server.http.RequestHandler;
+import net.phoenix.server.http.reflection.Route;
+import net.phoenix.server.http.reflection.Router;
+import net.phoenix.server.http.reflection.WebHandler;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.URISyntaxException;
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -21,7 +22,7 @@ import java.util.Map;
  * Server server = new Server(port, Main.class); <br>
  * server.start();
  * </code>
- * To create a route, simply annotate a method with the {@link net.phoenix.http.reflection.Route} annotation and annotate the class with the {@link net.phoenix.http.reflection.WebHandler} annotation. <br> <br>
+ * To create a route, simply annotate a method with the {@link Route} annotation and annotate the class with the {@link WebHandler} annotation. <br> <br>
  */
 public class Server {
 
@@ -90,9 +91,9 @@ public class Server {
         logger.logDebug("Scanning for routes in package \"" + clazz.getPackageName() + "\" initialised by " + clazz.getName());
         try {
             Router.generateRoutes();
-            for (Map.Entry<String, Method> entry : Router.getRoutes().entrySet()) {
-                logger.logDebug("Route: " + entry.getKey() + " -> function " + entry.getValue().getName() + "()"
-                        + " in " + entry.getValue().getDeclaringClass().getPackageName() + entry.getValue().getDeclaringClass().getName());
+            for (Map.Entry<String, Route> entry : Router.getRoutes().entrySet()) {
+                logger.logDebug("Route: " + entry.getKey() + " -> function " + entry.getValue().getPath() + "()"
+                        + " in " + entry.getValue().getMethod().getDeclaringClass().getPackageName() + entry.getValue().getMethod().getDeclaringClass().getName());
             }
         } catch (URISyntaxException | ClassNotFoundException e) {
             logger.logError("Failed to create routes due to: " + e.getMessage());

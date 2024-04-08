@@ -1,6 +1,6 @@
-package net.phoenix.http.builder;
+package net.phoenix.server.http.builder;
 
-import net.phoenix.http.container.HttpResponse;
+import net.phoenix.server.http.container.HttpResponse;
 
 import java.io.File;
 import java.io.FileInputStream;

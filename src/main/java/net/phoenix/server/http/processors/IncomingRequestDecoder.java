@@ -1,8 +1,8 @@
-package net.phoenix.http.processors;
+package net.phoenix.server.http.processors;
 
-import net.phoenix.http.builder.HttpRequestBuilder;
-import net.phoenix.http.container.HttpOpCode;
-import net.phoenix.http.container.HttpRequest;
+import net.phoenix.server.http.builder.HttpRequestBuilder;
+import net.phoenix.server.http.container.HttpOpCode;
+import net.phoenix.server.http.container.HttpRequest;
 
 /**
  * A class that processes incoming HTTP requests. This class is used internally to process incoming HTTP requests. It is not intended for use by the end user.

@@ -1,8 +1,10 @@
-package net.phoenix.http.processors;
+package net.phoenix.server.http;
 
-import net.phoenix.Server;
-import net.phoenix.http.builder.HttpResponseBuilder;
-import net.phoenix.http.container.HttpResponse;
+import net.phoenix.server.Server;
+import net.phoenix.server.http.builder.HttpResponseBuilder;
+import net.phoenix.server.http.container.HttpResponse;
+import net.phoenix.server.http.processors.IncomingRequest;
+import net.phoenix.server.http.processors.IncomingRequestDecoder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -50,6 +52,9 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
                 HttpResponse response;
                 try {
                     response = IncomingRequest.processRequest(IncomingRequestDecoder.processRequest(request, result.getRemoteAddress().toString()));
+                    if(response.responseHeaders().get("Upgrade") != null && response.responseHeaders().get("Upgrade").get(0).equals("h2c")) {
+                        response = new HttpResponseBuilder().setStatusCode(505).build();
+                    }
                 } catch (IOException e) {
                     Server.logger.logError("Failed to process request due to: " + e.getMessage());
                     throw new RuntimeException(e);
@@ -106,6 +111,7 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
      */
     private void scheduleTimeout(AsynchronousSocketChannel socketChannel, int timeout) {
         executor.schedule(() -> {
+            if(!socketChannel.isOpen()) return;
             try {
                 HttpResponse timeoutResponse = new HttpResponseBuilder().setStatusCode(408).build();
                 ByteBuffer responseBuffer = ByteBuffer.wrap(timeoutResponse.toString().getBytes(StandardCharsets.UTF_8));

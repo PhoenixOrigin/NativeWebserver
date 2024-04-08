@@ -1,4 +1,4 @@
-package net.phoenix.logging.container;
+package net.phoenix.server.logging.container;
 
 import java.awt.Color;
 import java.io.PrintStream;

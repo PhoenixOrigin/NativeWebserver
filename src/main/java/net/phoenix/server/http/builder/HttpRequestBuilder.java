@@ -1,7 +1,7 @@
-package net.phoenix.http.builder;
+package net.phoenix.server.http.builder;
 
-import net.phoenix.http.container.HttpOpCode;
-import net.phoenix.http.container.HttpRequest;
+import net.phoenix.server.http.container.HttpOpCode;
+import net.phoenix.server.http.container.HttpRequest;
 
 import java.util.HashMap;
 

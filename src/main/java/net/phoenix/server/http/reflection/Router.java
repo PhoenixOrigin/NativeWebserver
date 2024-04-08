@@ -1,10 +1,12 @@
-package net.phoenix.http.reflection;
+package net.phoenix.server.http.reflection;
 
-import net.phoenix.Server;
+import net.phoenix.server.Server;
+import net.phoenix.server.http.container.HttpRequest;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class Router {
 
-    private final static Map<String, Method> routes = new HashMap<>();
+    private final static Map<String, Route> routes = new HashMap<>();
 
     /**
      * Generates routes for the server.
@@ -40,9 +42,12 @@ public class Router {
         for (Class clazz : classes) {
             WebHandler webhandler = (WebHandler) clazz.getAnnotation(WebHandler.class);
             for(Method method : clazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(Route.class)) {
-                    Route route = method.getAnnotation(Route.class);
-                    addRoute(route.opCode().toString(), webhandler.path().concat(route.path()), method);
+                if (method.isAnnotationPresent(Route.StandardRoute.class)) {
+                    Route.StandardRoute route = method.getAnnotation(Route.StandardRoute.class);
+                    addRoute(route.opCode().toString(), webhandler.path().concat(route.path()), method, Route.Type.STANDARD);
+                } else if (method.isAnnotationPresent(Route.ProxyRoute.class)) {
+                    Route.ProxyRoute route = method.getAnnotation(Route.ProxyRoute.class);
+                    addRoute(route.opCode().toString(), webhandler.path().concat(route.path()), method, Route.Type.PROXY, route);
                 }
             }
         }
@@ -53,7 +58,7 @@ public class Router {
      *
      * @return The routes that have been generated
      */
-    public static Map<String, Method> getRoutes() {
+    public static Map<String, Route> getRoutes() {
         return routes;
     }
 
@@ -64,7 +69,7 @@ public class Router {
      * @param path   The path of the request
      * @return The method to run
      */
-    public static Method route(String opCode, String path) {
+    public static Route route(String opCode, String path, HttpRequest request) throws InvocationTargetException, IllegalAccessException {
         return routes.get(opCode.concat(" ").concat(path));
     }
 
@@ -75,8 +80,21 @@ public class Router {
      * @param route  The path of the route
      * @param runner The method to run when a request is received
      */
-    private static void addRoute(final String opCode, final String route, final Method runner) {
-        routes.put(opCode.concat(" ").concat(route), runner);
+    private static void addRoute(final String opCode, final String route, final Method runner, final Route.Type type) {
+        routes.put(opCode.concat(" ").concat(route), new Route(runner, route, type));
+    }
+
+    /**
+     * Adds a route to the server.
+     *
+     * @param opCode The HTTP method of the route
+     * @param route  The path of the route
+     * @param runner The method to run when a request is received
+     * @param type   The type of the route
+     * @param proxyRoute The proxy route annotation
+     */
+    private static void addRoute(final String opCode, final String route, final Method runner, final Route.Type type, final Route.ProxyRoute proxyRoute) {
+        routes.put(opCode.concat(" ").concat(route), new Route(runner, route, type, proxyRoute));
     }
 
     /**

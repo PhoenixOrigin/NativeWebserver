@@ -1,4 +1,4 @@
-package net.phoenix.http.container;
+package net.phoenix.server.http.container;
 
 /**
  * An enumeration of HTTP operation codes.

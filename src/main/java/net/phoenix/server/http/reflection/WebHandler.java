@@ -1,4 +1,4 @@
-package net.phoenix.http.reflection;
+package net.phoenix.server.http.reflection;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

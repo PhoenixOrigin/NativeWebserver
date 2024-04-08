@@ -1,7 +1,7 @@
-package net.phoenix.logging;
+package net.phoenix.server.logging;
 
-import net.phoenix.logging.container.Log;
-import net.phoenix.logging.container.Priority;
+import net.phoenix.server.logging.container.Log;
+import net.phoenix.server.logging.container.Priority;
 
 import java.io.File;
 import java.io.FileNotFoundException;
