@@ -25,6 +25,7 @@ public class HttpRequestBuilder {
 
     /**
      * Sets the headers of the HttpRequest.
+     *
      * @param headers The headers to change override the current headers with
      * @return This object for chaining.
      */
@@ -35,7 +36,8 @@ public class HttpRequestBuilder {
 
     /**
      * Adds a header to the HttpRequest.
-     * @param key The name of the header
+     *
+     * @param key   The name of the header
      * @param value The value of the header
      * @return This object for chaining.
      */
@@ -49,6 +51,7 @@ public class HttpRequestBuilder {
 
     /**
      * Sets the method of the HttpRequest.
+     *
      * @param method The HTTP OP Code to set
      * @return This object for chaining.
      */
@@ -59,6 +62,7 @@ public class HttpRequestBuilder {
 
     /**
      * Sets the path of the HttpRequest.
+     *
      * @param path The path queried
      * @return This object for chaining.
      */
@@ -69,6 +73,7 @@ public class HttpRequestBuilder {
 
     /**
      * Sets the body of the HttpRequest.
+     *
      * @param body The body of the request
      * @return This object for chaining.
      */
@@ -79,6 +84,7 @@ public class HttpRequestBuilder {
 
     /**
      * Sets the url parameters of the HttpRequest.
+     *
      * @param params The parameters to set
      * @return This object for chaining.
      */
@@ -89,7 +95,8 @@ public class HttpRequestBuilder {
 
     /**
      * Adds a url parameter to the HttpRequest.
-     * @param key The name of the parameter
+     *
+     * @param key   The name of the parameter
      * @param value The value of the parameter
      * @return This object for chaining.
      */
@@ -103,6 +110,7 @@ public class HttpRequestBuilder {
 
     /**
      * Sets the IP of the HttpRequest.
+     *
      * @param ip The IP address the request originated from
      * @return This object for chaining.
      */
@@ -113,6 +121,7 @@ public class HttpRequestBuilder {
 
     /**
      * Builds the HttpRequest object.
+     *
      * @return The HttpRequest object
      */
     public HttpRequest build() {

@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 public @interface WebHandler {
     /**
      * The base path of the web handler.
+     *
      * @return The path of the web handler
      */
     String path() default "/";

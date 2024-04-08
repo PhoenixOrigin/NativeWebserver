@@ -13,13 +13,14 @@ public class Log {
     private final String message;
     private final String timestamp;
     private final String loggerThread;
-    private Color color;
     private final String processId;
+    private Color color;
 
     /**
      * Creates a new log.
-     * @param priority The priority of the log
-     * @param message The message of the log
+     *
+     * @param priority     The priority of the log
+     * @param message      The message of the log
      * @param loggerThread The thread that logged the message
      */
     public Log(Priority priority, String message, String loggerThread) {
@@ -41,6 +42,7 @@ public class Log {
 
     /**
      * Generates the ANSI escape code for the color.
+     *
      * @param r The red value of the color
      * @param g The green value of the color
      * @param b The blue value of the color
@@ -52,6 +54,7 @@ public class Log {
 
     /**
      * Sends the log to an output stream.
+     *
      * @param out The output stream to send the log to
      */
     public void send(PrintStream out) {
@@ -61,7 +64,8 @@ public class Log {
 
     /**
      * Sends the log to an output stream and a log file.
-     * @param out The output stream to send the log to
+     *
+     * @param out     The output stream to send the log to
      * @param logFile The log file to write the log to
      */
     public void send(PrintStream out, PrintStream logFile) {

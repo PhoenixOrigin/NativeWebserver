@@ -20,7 +20,8 @@ public class Router {
 
     /**
      * Generates routes for the server to use. This method should not be called, edited, or otherwise used or modified by the end user in any situation.
-     * @throws URISyntaxException If the URI is invalid
+     *
+     * @throws URISyntaxException     If the URI is invalid
      * @throws ClassNotFoundException If the class is not found
      */
     public static void generateRoutes() throws URISyntaxException, ClassNotFoundException {
@@ -41,6 +42,7 @@ public class Router {
 
     /**
      * Gets the routes that have been generated.
+     *
      * @return The routes that have been generated
      */
     public static Map<String, Method> getRoutes() {
@@ -49,8 +51,9 @@ public class Router {
 
     /**
      * Routes an incoming request to the correct method.
+     *
      * @param opCode The HTTP method of the request
-     * @param path The path of the request
+     * @param path   The path of the request
      * @return The method to run
      */
     public static Method route(String opCode, String path) {
@@ -59,8 +62,9 @@ public class Router {
 
     /**
      * Adds a route to the server.
+     *
      * @param opCode The HTTP method of the route
-     * @param route The path of the route
+     * @param route  The path of the route
      * @param runner The method to run when a request is received
      */
     private static void addRoute(final String opCode, final String route, final Method runner) {
@@ -69,6 +73,7 @@ public class Router {
 
     /**
      * Scans for classes with the specified annotation.
+     *
      * @param annotationClass The annotation to scan for
      * @return A list of classes with the specified annotation
      */
@@ -91,9 +96,10 @@ public class Router {
 
     /**
      * Gets all classes in the classpath.
+     *
      * @param classLoader The class loader to use
      * @return An array of all classes in the classpath
-     * @throws IOException If an I/O error occurs
+     * @throws IOException            If an I/O error occurs
      * @throws ClassNotFoundException If the class is not found
      */
     private static Class<?>[] getAllClasses(ClassLoader classLoader) throws IOException, ClassNotFoundException {
@@ -120,8 +126,9 @@ public class Router {
 
         /**
          * Creates a new ClassFinder.
+         *
          * @param classpathEntry The classpath entry to search
-         * @param parent The parent class loader
+         * @param parent         The parent class loader
          */
         ClassFinder(String classpathEntry, ClassLoader parent) {
             super(parent);
@@ -130,8 +137,9 @@ public class Router {
 
         /**
          * Gets all classes in the classpath.
+         *
          * @return An array of all classes in the classpath
-         * @throws IOException If an I/O error occurs
+         * @throws IOException            If an I/O error occurs
          * @throws ClassNotFoundException If the class is not found
          */
         Class<?>[] getClasses() throws IOException, ClassNotFoundException {

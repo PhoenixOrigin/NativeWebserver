@@ -22,11 +22,14 @@ public @interface Route {
      * <code>If the class path is "/test", and the method path is "/test2", the full path will be "/test/test2".</code>
      * <br> <br>
      * Warning: <code>If the class path is "/", and the method path is "/test", the full path will be "//test", not "/test".</code>
+     *
      * @return The path of the route
      */
     String path() default "";
+
     /**
      * The HTTP method of the route.
+     *
      * @return The HTTP method of the route
      */
     HttpOpCode opCode() default HttpOpCode.GET;

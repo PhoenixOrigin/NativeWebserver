@@ -18,8 +18,8 @@ import java.util.Map;
  * This class is used to start the server and handle incoming requests. <br> <br>
  * Starting the server is as simple as <br> <br>
  * <code>
- *     Server server = new Server(port, Main.class); <br>
- *     server.start();
+ * Server server = new Server(port, Main.class); <br>
+ * server.start();
  * </code>
  * To create a route, simply annotate a method with the {@link net.phoenix.http.reflection.Route} annotation and annotate the class with the {@link net.phoenix.http.reflection.WebHandler} annotation. <br> <br>
  */
@@ -31,7 +31,8 @@ public class Server {
 
     /**
      * Creates a new server instance.
-     * @param port The port to start the server on
+     *
+     * @param port  The port to start the server on
      * @param clazz The class to scan for routes
      */
     public Server(int port, Class<?> clazz) {
@@ -48,6 +49,7 @@ public class Server {
 
     /**
      * Checks the stack trace for a call to System.exit().
+     *
      * @return The stack trace element that called System.exit(), or null if it was not called
      */
     private static String checkStackTrace() {
@@ -63,6 +65,7 @@ public class Server {
 
     /**
      * Starts the server.
+     *
      * @throws IOException If the server fails to start
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")

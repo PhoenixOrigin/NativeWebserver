@@ -11,8 +11,9 @@ public class IncomingRequestDecoder {
 
     /**
      * Processes an incoming HTTP request. This method should not be called, edited, or otherwise used or modified by the end user in any situation.
+     *
      * @param data The data to process
-     * @param ip The IP address the request has originated from
+     * @param ip   The IP address the request has originated from
      * @return The request to process
      */
     public static HttpRequest processRequest(String data, String ip) {

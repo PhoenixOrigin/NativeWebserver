@@ -24,9 +24,10 @@ public class Logger {
 
     /**
      * Creates a new logger.
-     * @param out The output stream to log to
+     *
+     * @param out        The output stream to log to
      * @param threadName The name of the thread that is logging
-     * @param logFile The file to log to
+     * @param logFile    The file to log to
      * @param accessLogs The file to log access logs to
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -75,6 +76,7 @@ public class Logger {
 
     /**
      * Logs a raw message to the output stream and the log file.
+     *
      * @param message The message to log
      */
     public void logRaw(String message) {
@@ -84,6 +86,7 @@ public class Logger {
 
     /**
      * Logs a debug message.
+     *
      * @param message The message to log
      */
     public void logDebug(String message) {
@@ -92,6 +95,7 @@ public class Logger {
 
     /**
      * Logs an info message.
+     *
      * @param message The message to log
      */
     public void logInfo(String message) {
@@ -100,6 +104,7 @@ public class Logger {
 
     /**
      * Logs a warning message.
+     *
      * @param message The message to log
      */
     public void logWarn(String message) {
@@ -108,6 +113,7 @@ public class Logger {
 
     /**
      * Logs an error message.
+     *
      * @param message The message to log
      */
     public void logError(String message) {
@@ -116,6 +122,7 @@ public class Logger {
 
     /**
      * Logs an exception.
+     *
      * @param e The exception to log
      */
     public void logException(Exception e) {
@@ -124,7 +131,8 @@ public class Logger {
 
     /**
      * Logs a connection.
-     * @param ip The IP address of the connection
+     *
+     * @param ip   The IP address of the connection
      * @param path The path of the connection
      */
     public void logConnection(String ip, String path) {
