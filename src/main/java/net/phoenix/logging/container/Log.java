@@ -1,6 +1,6 @@
 package net.phoenix.logging.container;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;

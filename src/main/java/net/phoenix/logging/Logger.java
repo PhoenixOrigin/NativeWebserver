@@ -3,7 +3,11 @@ package net.phoenix.logging;
 import net.phoenix.logging.container.Log;
 import net.phoenix.logging.container.Priority;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
