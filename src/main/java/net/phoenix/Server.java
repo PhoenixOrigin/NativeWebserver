@@ -117,7 +117,7 @@ public class Server {
         }));
         logger.logInfo("Shutdown hooks registered successfully");
         logger.logInfo("Server started at " + new SimpleDateFormat("MM/dd/yyyy-HH:mm:ss").format(new Date()) + " on " + socket.getLocalAddress());
-        logger.logInfo("Starting server thread");
+        logger.logInfo("Starting server-thread");
         Thread thread = new Thread(() -> {
             while (true) {
                 socket.accept(null, new RequestHandler());
@@ -131,7 +131,9 @@ public class Server {
         });
         thread.setName("Server-Thread");
         thread.start();
-        logger.logInfo("Server thread started successfully");
+        logger.logInfo("server-thread started successfully");
+        logger.logInfo("Server is now listening for incoming connections");
+
     }
 
 }

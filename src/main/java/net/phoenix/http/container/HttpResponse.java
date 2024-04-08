@@ -66,6 +66,7 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
             final byte[] buffer = new byte[2048];
             int bytesRead;
             while ((bytesRead = entityStream.read(buffer)) != -1) {
+                if(!channel.isOpen()) return;
                 channel.write(ByteBuffer.wrap(buffer, 0, bytesRead)).get();
             }
             entityStream.close();

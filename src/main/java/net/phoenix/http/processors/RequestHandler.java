@@ -56,7 +56,7 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
                 }
                 try {
                     long dataLength = response.responseHeaders().get("Content-Length") != null ? Long.parseLong(response.responseHeaders().get("Content-Length").get(0)) : 0;
-                    scheduleTimeout(result, (int) (dataLength / 1024), TimeUnit.MILLISECONDS);
+                    scheduleTimeout(result, Math.max((int) (dataLength / 51.2), 5000));
                     result.write(ByteBuffer.wrap(response.toString().getBytes(StandardCharsets.UTF_8))).get();
                     response.writeInputStream(result);
                 } catch (IOException e) {
@@ -103,9 +103,8 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
      *
      * @param socketChannel The socket channel to schedule the timeout for
      * @param timeout       The timeout duration
-     * @param unit          The unit of the timeout duration
      */
-    private void scheduleTimeout(AsynchronousSocketChannel socketChannel, int timeout, TimeUnit unit) {
+    private void scheduleTimeout(AsynchronousSocketChannel socketChannel, int timeout) {
         executor.schedule(() -> {
             try {
                 HttpResponse timeoutResponse = new HttpResponseBuilder().setStatusCode(408).build();
@@ -120,6 +119,6 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
                 Server.logger.logError("Failed to write response to client due to: " + e.getMessage());
                 throw new RuntimeException(e);
             }
-        }, timeout, unit);
+        }, timeout, TimeUnit.MILLISECONDS);
     }
 }
