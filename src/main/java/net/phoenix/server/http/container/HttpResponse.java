@@ -1,5 +1,7 @@
 package net.phoenix.server.http.container;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -23,7 +25,7 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
      * @param responseHeaders The headers to build
      * @return A list of strings representing the headers
      */
-    private static List<String> buildHeaderStrings(final Map<String, List<String>> responseHeaders) {
+    private static @NotNull List<String> buildHeaderStrings(final @NotNull Map<String, List<String>> responseHeaders) {
         final List<String> responseHeadersList = new ArrayList<>();
 
         responseHeaders.forEach((name, values) -> {
@@ -43,7 +45,7 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
      * @param entity The entity to get the response string from
      * @return The body string
      */
-    private static Optional<String> getResponseString(final Object entity) {
+    private static @NotNull Optional<String> getResponseString(final Object entity) {
         if (entity instanceof String) {
             try {
                 return Optional.of(entity.toString());
@@ -61,12 +63,12 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
      * @throws ExecutionException   If an exception occurs during execution
      * @throws InterruptedException If the current thread is interrupted
      */
-    public void writeInputStream(final AsynchronousSocketChannel channel) throws IOException, ExecutionException, InterruptedException {
+    public void writeInputStream(final @NotNull AsynchronousSocketChannel channel) throws IOException, ExecutionException, InterruptedException {
         if (entity.isPresent() && entity.get() instanceof InputStream entityStream) {
             final byte[] buffer = new byte[2048];
             int bytesRead;
             while ((bytesRead = entityStream.read(buffer)) != -1) {
-                if(!channel.isOpen()) return;
+                if (!channel.isOpen()) return;
                 channel.write(ByteBuffer.wrap(buffer, 0, bytesRead)).get();
             }
             entityStream.close();
@@ -79,7 +81,7 @@ public record HttpResponse(Map<String, List<String>> responseHeaders, int status
      * @return The status code
      */
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         StringBuilder sb = new StringBuilder();
 
         final int statusCode = statusCode();

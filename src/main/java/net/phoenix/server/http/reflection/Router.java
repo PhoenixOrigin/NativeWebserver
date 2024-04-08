@@ -1,12 +1,11 @@
 package net.phoenix.server.http.reflection;
 
 import net.phoenix.server.Server;
-import net.phoenix.server.http.container.HttpRequest;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,8 +26,9 @@ public class Router {
 
     /**
      * Generates routes for the server.
-     * @throws IOException If an I/O error occurs
-     * @throws URISyntaxException If a URI syntax error occurs
+     *
+     * @throws IOException            If an I/O error occurs
+     * @throws URISyntaxException     If a URI syntax error occurs
      * @throws ClassNotFoundException If the class is not found
      */
     public static void generateRoutes() throws IOException, URISyntaxException, ClassNotFoundException {
@@ -41,13 +41,13 @@ public class Router {
 
         for (Class clazz : classes) {
             WebHandler webhandler = (WebHandler) clazz.getAnnotation(WebHandler.class);
-            for(Method method : clazz.getDeclaredMethods()) {
+            for (Method method : clazz.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(Route.StandardRoute.class)) {
                     Route.StandardRoute route = method.getAnnotation(Route.StandardRoute.class);
-                    addRoute(route.opCode().toString(), webhandler.path().concat(route.path()), method, Route.Type.STANDARD);
+                    addRoute(route.opCode().toString(), webhandler.path().concat(route.path()), method);
                 } else if (method.isAnnotationPresent(Route.ProxyRoute.class)) {
                     Route.ProxyRoute route = method.getAnnotation(Route.ProxyRoute.class);
-                    addRoute(route.opCode().toString(), webhandler.path().concat(route.path()), method, Route.Type.PROXY, route);
+                    addRoute(route.opCode().toString(), webhandler.path().concat(route.path()), method, route);
                 }
             }
         }
@@ -58,7 +58,7 @@ public class Router {
      *
      * @return The routes that have been generated
      */
-    public static Map<String, Route> getRoutes() {
+    public static @NotNull Map<String, Route> getRoutes() {
         return routes;
     }
 
@@ -69,7 +69,7 @@ public class Router {
      * @param path   The path of the request
      * @return The method to run
      */
-    public static Route route(String opCode, String path, HttpRequest request) throws InvocationTargetException, IllegalAccessException {
+    public static Route route(@NotNull String opCode, @NotNull String path) {
         return routes.get(opCode.concat(" ").concat(path));
     }
 
@@ -80,32 +80,32 @@ public class Router {
      * @param route  The path of the route
      * @param runner The method to run when a request is received
      */
-    private static void addRoute(final String opCode, final String route, final Method runner, final Route.Type type) {
-        routes.put(opCode.concat(" ").concat(route), new Route(runner, route, type));
+    private static void addRoute(final @NotNull String opCode, final @NotNull String route, final Method runner) {
+        routes.put(opCode.concat(" ").concat(route), new Route(runner, route, Route.Type.STANDARD));
     }
 
     /**
      * Adds a route to the server.
      *
-     * @param opCode The HTTP method of the route
-     * @param route  The path of the route
-     * @param runner The method to run when a request is received
-     * @param type   The type of the route
+     * @param opCode     The HTTP method of the route
+     * @param route      The path of the route
+     * @param runner     The method to run when a request is received
      * @param proxyRoute The proxy route annotation
      */
-    private static void addRoute(final String opCode, final String route, final Method runner, final Route.Type type, final Route.ProxyRoute proxyRoute) {
-        routes.put(opCode.concat(" ").concat(route), new Route(runner, route, type, proxyRoute));
+    private static void addRoute(final @NotNull String opCode, final @NotNull String route, final Method runner, final Route.ProxyRoute proxyRoute) {
+        routes.put(opCode.concat(" ").concat(route), new Route(runner, route, Route.Type.PROXY, proxyRoute));
     }
 
     /**
      * Gets all classes in the specified package.
+     *
      * @param packageName The package to search
      * @return A list of classes in the package
-     * @throws IOException If an I/O error occurs
-     * @throws URISyntaxException If a URI syntax error occurs
+     * @throws IOException            If an I/O error occurs
+     * @throws URISyntaxException     If a URI syntax error occurs
      * @throws ClassNotFoundException If the class is not found
      */
-    private static List<Class> getClasses(String packageName) throws IOException, URISyntaxException, ClassNotFoundException {
+    private static @NotNull List<Class> getClasses(@NotNull String packageName) throws IOException, URISyntaxException, ClassNotFoundException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         String path = packageName.replace('.', '/');
         Enumeration<URL> resources = classLoader.getResources(path);
@@ -124,12 +124,13 @@ public class Router {
 
     /**
      * Finds classes in the specified directory.
-     * @param directory The directory to search
+     *
+     * @param directory   The directory to search
      * @param packageName The package name
      * @return A list of classes in the directory
      * @throws ClassNotFoundException If the class is not found
      */
-    private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
+    private static @NotNull List<Class> findClasses(@NotNull File directory, String packageName) throws ClassNotFoundException {
         List<Class> classes = new ArrayList<>();
         if (!directory.exists()) {
             return classes;
@@ -139,8 +140,7 @@ public class Router {
         for (File file : files) {
             if (file.isDirectory()) {
                 classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            }
-            else if (file.getName().endsWith(".class")) {
+            } else if (file.getName().endsWith(".class")) {
                 classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
             }
         }
@@ -153,7 +153,7 @@ public class Router {
      * @param annotationClass The annotation to scan for
      * @return A list of classes with the specified annotation
      */
-    public static List<Class> scanForAnnotation(Class<? extends Annotation> annotationClass) {
+    public static @NotNull List<Class> scanForAnnotation(@NotNull Class<? extends Annotation> annotationClass) {
         List<Class> classes = new ArrayList<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try {
@@ -178,7 +178,7 @@ public class Router {
      * @throws IOException            If an I/O error occurs
      * @throws ClassNotFoundException If the class is not found
      */
-    private static Class<?>[] getAllClasses(ClassLoader classLoader) throws IOException, ClassNotFoundException {
+    private static Class<?> @NotNull [] getAllClasses(ClassLoader classLoader) throws IOException, ClassNotFoundException {
         String[] classpathEntries = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
         int count = 0;
         Class<?>[] classes = new Class<?>[1000];
@@ -218,7 +218,7 @@ public class Router {
          * @throws IOException            If an I/O error occurs
          * @throws ClassNotFoundException If the class is not found
          */
-        Class<?>[] getClasses() throws IOException, ClassNotFoundException {
+        Class<?> @NotNull [] getClasses() throws IOException, ClassNotFoundException {
             int count = 0;
             Class<?>[] classes = new Class<?>[1000];
             URL url = new java.io.File(classpathEntry).toURI().toURL();

@@ -3,6 +3,7 @@ package net.phoenix.server.http.processors;
 import net.phoenix.server.http.builder.HttpRequestBuilder;
 import net.phoenix.server.http.container.HttpOpCode;
 import net.phoenix.server.http.container.HttpRequest;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A class that processes incoming HTTP requests. This class is used internally to process incoming HTTP requests. It is not intended for use by the end user.
@@ -16,7 +17,7 @@ public class IncomingRequestDecoder {
      * @param ip   The IP address the request has originated from
      * @return The request to process
      */
-    public static HttpRequest processRequest(String data, String ip) {
+    public static HttpRequest processRequest(@NotNull String data, String ip) {
         HttpRequestBuilder requestBuilder = new HttpRequestBuilder();
         String[] headerData = data.split("\r\n");
         String[] requestLine = headerData[0].split(" ");

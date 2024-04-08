@@ -5,6 +5,7 @@ import net.phoenix.server.http.container.HttpRequest;
 import net.phoenix.server.http.container.HttpResponse;
 import net.phoenix.server.http.reflection.Route;
 import net.phoenix.server.http.reflection.Router;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -23,14 +24,14 @@ public class IncomingRequest {
      * @param request The request to process
      * @return The response to send back to the client
      */
-    public static HttpResponse processRequest(HttpRequest request) {
+    public static HttpResponse processRequest(@NotNull HttpRequest request) {
         try {
             if (request.path().contains("..")) {
                 Server.logger.logError("Illegal path traversal containing \"../\" detected from " + request.ip());
                 return getError(403).build();
             }
-            Route r = Router.route(request.method().toString(), request.path().split("\\?")[0], request);
-            if(r == null) {
+            Route r = Router.route(request.method().toString(), request.path().split("\\?")[0]);
+            if (r == null) {
                 try {
                     return getFile(request.path().split("\\?")[0]).build();
                 } catch (IOException e) {

@@ -1,5 +1,7 @@
 package net.phoenix.server.http.container;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * An enumeration of HTTP operation codes.
  */
@@ -22,7 +24,7 @@ public enum HttpOpCode {
      * @return The HttpOpCode
      * @throws IllegalArgumentException If the string is not a valid (or just not contained in this library) HTTP method
      */
-    public static HttpOpCode fromString(String method) {
+    public static @NotNull HttpOpCode fromString(@NotNull String method) {
         return switch (method) {
             case "GET" -> GET;
             case "POST" -> POST;
@@ -38,7 +40,7 @@ public enum HttpOpCode {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return this.name();
     }
 }

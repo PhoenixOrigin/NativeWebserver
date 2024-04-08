@@ -2,6 +2,7 @@ package net.phoenix.server.http.builder;
 
 import net.phoenix.server.http.container.HttpOpCode;
 import net.phoenix.server.http.container.HttpRequest;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
@@ -29,7 +30,7 @@ public class HttpRequestBuilder {
      * @param headers The headers to change override the current headers with
      * @return This object for chaining.
      */
-    public HttpRequestBuilder setHeaders(HashMap<String, String> headers) {
+    public @NotNull HttpRequestBuilder setHeaders(HashMap<String, String> headers) {
         this.headers = headers;
         return this;
     }
@@ -41,7 +42,7 @@ public class HttpRequestBuilder {
      * @param value The value of the header
      * @return This object for chaining.
      */
-    public HttpRequestBuilder addHeader(String key, String value) {
+    public @NotNull HttpRequestBuilder addHeader(String key, String value) {
         if (headers == null) {
             headers = new HashMap<>();
         }
@@ -55,7 +56,7 @@ public class HttpRequestBuilder {
      * @param method The HTTP OP Code to set
      * @return This object for chaining.
      */
-    public HttpRequestBuilder setMethod(HttpOpCode method) {
+    public @NotNull HttpRequestBuilder setMethod(HttpOpCode method) {
         this.method = method;
         return this;
     }
@@ -66,7 +67,7 @@ public class HttpRequestBuilder {
      * @param path The path queried
      * @return This object for chaining.
      */
-    public HttpRequestBuilder setPath(String path) {
+    public @NotNull HttpRequestBuilder setPath(String path) {
         this.path = path;
         return this;
     }
@@ -77,7 +78,7 @@ public class HttpRequestBuilder {
      * @param body The body of the request
      * @return This object for chaining.
      */
-    public HttpRequestBuilder setBody(String body) {
+    public @NotNull HttpRequestBuilder setBody(String body) {
         this.body = body;
         return this;
     }
@@ -88,19 +89,19 @@ public class HttpRequestBuilder {
      * @param params The parameters to set
      * @return This object for chaining.
      */
-    public HttpRequestBuilder setParams(HashMap<String, String> params) {
+    public @NotNull HttpRequestBuilder setParams(HashMap<String, String> params) {
         this.params = params;
         return this;
     }
 
     /**
-     * Adds a url parameter to the HttpRequest.
+     * Adds an url parameter to the HttpRequest.
      *
      * @param key   The name of the parameter
      * @param value The value of the parameter
      * @return This object for chaining.
      */
-    public HttpRequestBuilder addParam(String key, String value) {
+    public @NotNull HttpRequestBuilder addParam(String key, String value) {
         if (params == null) {
             params = new HashMap<>();
         }
@@ -114,7 +115,7 @@ public class HttpRequestBuilder {
      * @param ip The IP address the request originated from
      * @return This object for chaining.
      */
-    public HttpRequestBuilder setIp(String ip) {
+    public @NotNull HttpRequestBuilder setIp(String ip) {
         this.ip = ip;
         return this;
     }
@@ -124,7 +125,7 @@ public class HttpRequestBuilder {
      *
      * @return The HttpRequest object
      */
-    public HttpRequest build() {
+    public @NotNull HttpRequest build() {
         return new HttpRequest(headers, method, path, body, params, ip);
     }
 }

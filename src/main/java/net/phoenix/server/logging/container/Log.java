@@ -1,6 +1,8 @@
 package net.phoenix.server.logging.container;
 
-import java.awt.Color;
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -11,9 +13,9 @@ import java.util.Date;
 public class Log {
     private final Priority priority;
     private final String message;
-    private final String timestamp;
+    private final @NotNull String timestamp;
     private final String loggerThread;
-    private final String processId;
+    private final @NotNull String processId;
     private Color color;
 
     /**
@@ -57,7 +59,7 @@ public class Log {
      *
      * @param out The output stream to send the log to
      */
-    public void send(PrintStream out) {
+    public void send(@NotNull PrintStream out) {
         out.println("[" + timestamp + "] " + "[" + loggerThread + ": " + processId + "] [" + priority + "] " + message);
         out.flush();
     }
@@ -68,7 +70,7 @@ public class Log {
      * @param out     The output stream to send the log to
      * @param logFile The log file to write the log to
      */
-    public void send(PrintStream out, PrintStream logFile) {
+    public void send(@NotNull PrintStream out, @NotNull PrintStream logFile) {
         out.println("[" + timestamp + "] " + "[" + loggerThread + ": " + processId + "] " + "[" + priority + "] " + get_color_escape(color.getRed(), color.getGreen(), color.getBlue()) + message + "\033[0;0m");
         logFile.println("[" + timestamp + "] [" + loggerThread + "] [" + priority + "] " + message);
         out.flush();

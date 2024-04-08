@@ -1,6 +1,8 @@
 package net.phoenix.server.http.builder;
 
 import net.phoenix.server.http.container.HttpResponse;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,7 +23,7 @@ public class HttpResponseBuilder {
     private Map<String, List<String>> responseHeaders;
     private int statusCode;
     private Optional<Object> entity;
-    private Optional<Long> inputStreamLength = Optional.of(0L);
+    private @NotNull Optional<Long> inputStreamLength = Optional.of(0L);
 
     /**
      * Creates a new HttpResponseBuilder.
@@ -40,7 +42,7 @@ public class HttpResponseBuilder {
      * @param statusCode The status code that should be returned to the client
      * @return This object for chaining.
      */
-    public HttpResponseBuilder setStatusCode(final int statusCode) {
+    public @NotNull HttpResponseBuilder setStatusCode(final int statusCode) {
         this.statusCode = statusCode;
         return this;
     }
@@ -51,7 +53,7 @@ public class HttpResponseBuilder {
      * @param headers The headers to override the current headers with
      * @return This object for chaining.
      */
-    public HttpResponseBuilder setHeaders(final Map<String, List<String>> headers) {
+    public @NotNull HttpResponseBuilder setHeaders(final Map<String, List<String>> headers) {
         responseHeaders = headers;
         responseHeaders.put("Date", List.of(DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now(ZoneOffset.UTC))));
         if (!responseHeaders.containsKey("Server"))
@@ -66,7 +68,7 @@ public class HttpResponseBuilder {
      * @param value The value of the header
      * @return This object for chaining.
      */
-    public HttpResponseBuilder addHeader(final String name, final String value) {
+    public @NotNull HttpResponseBuilder addHeader(final String name, final @NotNull String value) {
         responseHeaders.put(name, List.of(value));
         return this;
     }
@@ -77,7 +79,7 @@ public class HttpResponseBuilder {
      * @param entity The entity to return to the client
      * @return This object for chaining.
      */
-    public HttpResponseBuilder setEntity(final String entity) {
+    public @NotNull HttpResponseBuilder setEntity(final @Nullable String entity) {
         if (entity != null) {
             this.entity = Optional.of(entity);
         }
@@ -90,7 +92,7 @@ public class HttpResponseBuilder {
      * @param entity The entity to return to the client
      * @return This object for chaining.
      */
-    public HttpResponseBuilder setEntity(final File entity) throws FileNotFoundException {
+    public @NotNull HttpResponseBuilder setEntity(final @Nullable File entity) throws FileNotFoundException {
         if (entity != null) {
             this.entity = Optional.of(new FileInputStream(entity));
             inputStreamLength = Optional.of(entity.length());
@@ -103,7 +105,7 @@ public class HttpResponseBuilder {
      *
      * @return A new HttpResponse object
      */
-    public HttpResponse build() {
+    public @NotNull HttpResponse build() {
         return new HttpResponse(responseHeaders, statusCode, entity, inputStreamLength);
     }
 

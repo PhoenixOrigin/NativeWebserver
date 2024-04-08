@@ -2,6 +2,7 @@ package net.phoenix.server.logging;
 
 import net.phoenix.server.logging.container.Log;
 import net.phoenix.server.logging.container.Priority;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,8 +20,8 @@ public class Logger {
 
     private final PrintStream out;
     private final String threadName;
-    private final PrintStream logFile;
-    private final PrintStream accessLogs;
+    private final @NotNull PrintStream logFile;
+    private final @NotNull PrintStream accessLogs;
 
     public Logger(PrintStream out) {
         this(out, Thread.currentThread().getName(), new File("./logs/" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(" ", "-").replace(",", "").toLowerCase() + ".log"), new File("./logs/access-log-" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(",", "").replace(" ", "-").toLowerCase() + ".log"));
@@ -34,48 +35,41 @@ public class Logger {
      * @param logFile    The file to log to
      * @param accessLogs The file to log access logs to
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public Logger(PrintStream out, String threadName, File logFile, File accessLogs) {
+    public Logger(PrintStream out, String threadName, @NotNull File logFile, @NotNull File accessLogs) {
         this.out = out;
         this.threadName = threadName;
-        try {
-            if (logFile.exists()) {
-                int i = 1;
-                while (logFile.exists()) {
-                    logFile = new File("./logs/" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(" ", "-").replace(",", "").toLowerCase() + "-" + i + ".log");
-                    i++;
-                }
-            }
-            logFile.createNewFile();
-        } catch (IOException e) {
-            logException(e);
-        }
-        try {
-            this.logFile = new PrintStream(new FileOutputStream(logFile, false));
-        } catch (FileNotFoundException e) {
-            logException(e);
-            throw new RuntimeException(e);
-        }
-        try {
-            if (accessLogs.exists()) {
-                int i = 1;
-                while (accessLogs.exists()) {
-                    accessLogs = new File("./logs/access-" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(" ", "-").replace(",", "").toLowerCase() + "-" + i + ".log");
-                    i++;
-                }
-            }
-            accessLogs.createNewFile();
-        } catch (IOException e) {
-            logException(e);
-        }
-        try {
-            this.accessLogs = new PrintStream(new FileOutputStream(accessLogs, false));
-        } catch (FileNotFoundException e) {
-            logException(e);
-            throw new RuntimeException(e);
-        }
+        this.logFile = processFile(logFile);
+        this.accessLogs = processFile(accessLogs);
         Runtime.getRuntime().addShutdownHook(new Thread(this.logFile::close));
         Runtime.getRuntime().addShutdownHook(new Thread(this.accessLogs::close));
+    }
+
+    /**
+     * Processes a file.
+     *
+     * @param toProcess The file to process
+     * @return The processed file
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private PrintStream processFile(File toProcess) {
+        try {
+            if (toProcess.exists()) {
+                int i = 1;
+                while (toProcess.exists()) {
+                    toProcess = new File("./logs/" + DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.ENGLISH).format(new Date()).replace(" ", "-").replace(",", "").toLowerCase() + "-" + i + ".log");
+                    i++;
+                }
+            }
+            toProcess.createNewFile();
+        } catch (IOException e) {
+            logException(e);
+        }
+        try {
+            return new PrintStream(new FileOutputStream(toProcess, false));
+        } catch (FileNotFoundException e) {
+            logException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -129,7 +123,7 @@ public class Logger {
      *
      * @param e The exception to log
      */
-    public void logException(Exception e) {
+    public void logException(@NotNull Exception e) {
         new Log(Priority.ERROR, e.getMessage(), threadName).send(out, logFile);
     }
 

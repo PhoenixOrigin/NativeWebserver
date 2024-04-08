@@ -5,6 +5,8 @@ import net.phoenix.server.http.builder.HttpResponseBuilder;
 import net.phoenix.server.http.container.HttpOpCode;
 import net.phoenix.server.http.container.HttpRequest;
 import net.phoenix.server.http.container.HttpResponse;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,39 +25,13 @@ import java.util.Objects;
 /**
  * A class that represents a route.
  */
+@SuppressWarnings("ClassEscapesDefinedScope")
 public class Route {
 
-    private static Method method = null;
+    private static @Nullable Method method = null;
+    private static @Nullable Type type = null;
+    private static @Nullable ProxyRoute proxyRoute = null;
     private final String path;
-    private static Type type = null;
-    private static ProxyRoute proxyRoute = null;
-
-    /**
-        * Gets the method of the route.
-        *
-        * @return The method of the route
-     */
-    public Method getMethod() {
-        return method;
-    }
-
-    /**
-     * Gets the path of the route.
-        *
-        * @return The path of the route
-     */
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * Gets the type of the route.
-        *
-        * @return The type of the route
-     */
-    public Type getType() {
-        return type;
-    }
 
     /**
      * Creates a new route.
@@ -64,41 +40,27 @@ public class Route {
      * @param path   The path of the route
      * @param type   The type of the route
      */
-    public Route(Method method, String path, Type type, ProxyRoute proxyRoute) {
+    public Route(@Nullable Method method, String path, @Nullable Type type, @Nullable ProxyRoute proxyRoute) {
         Route.method = method;
         this.path = path;
         Route.type = type;
         Route.proxyRoute = proxyRoute;
     }
 
-    public Route(Method method, String path, Type type) {
+    public Route(@Nullable Method method, String path, @Nullable Type type) {
         Route.method = method;
         this.path = path;
         Route.type = type;
     }
 
     /**
-     * Routes the request to the appropriate method.
-     *
-     * @param request The request to route
-     * @return The response to send back to the client
-     * @throws InvocationTargetException If the target method throws an exception
-     * @throws IllegalAccessException    If the target method is inaccessible
-     */
-    public HttpResponse route(HttpRequest request) throws InvocationTargetException, IllegalAccessException {
-        if (getType() == Type.PROXY) {
-            return proxyRoute(request);
-        } else {
-            return standardRoute(request);
-        }
-    }
-
-    /**
      * Proxies the request to the target.
+     *
      * @param request The request to proxy
      * @return The response from the target
      */
-    private static HttpResponse proxyRoute(HttpRequest request) {
+    @SuppressWarnings("DataFlowIssue")
+    private static HttpResponse proxyRoute(@NotNull HttpRequest request) {
         HttpClient client = HttpClient.newHttpClient();
         java.net.http.HttpRequest.Builder builder = java.net.http.HttpRequest.newBuilder();
         try {
@@ -124,7 +86,8 @@ public class Route {
      * @throws InvocationTargetException If the target method throws an exception
      * @throws IllegalAccessException    If the target method is inaccessible
      */
-    private static HttpResponse standardRoute(HttpRequest request) throws InvocationTargetException, IllegalAccessException {
+    @SuppressWarnings("DataFlowIssue")
+    private static HttpResponse standardRoute(@NotNull HttpRequest request) throws InvocationTargetException, IllegalAccessException {
         HttpResponse response;
 
         Object r = method.invoke(null, request);
@@ -174,7 +137,7 @@ public class Route {
      * @throws NullPointerException If the file does not exist
      */
     @SuppressWarnings("StringEquality")
-    public static HttpResponseBuilder getFile(String path) throws IOException, NullPointerException {
+    public static @NotNull HttpResponseBuilder getFile(String path) throws IOException, NullPointerException {
         File f = new File(Objects.requireNonNull(Server.clazz.getResource("/static/" + path)).getFile());
         String type = Files.probeContentType(f.toPath());
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
@@ -183,6 +146,49 @@ public class Route {
         responseBuilder.addHeader("Content-Disposition", type.contains("text") || type == "application/javascript" ? "inline" : "attachment" + "; filename=" + path);
         responseBuilder.setEntity(f);
         return responseBuilder;
+    }
+
+    /**
+     * Gets the method of the route.
+     *
+     * @return The method of the route
+     */
+    public Method getMethod() {
+        return method;
+    }
+
+    /**
+     * Gets the path of the route.
+     *
+     * @return The path of the route
+     */
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * Gets the type of the route.
+     *
+     * @return The type of the route
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
+     * Routes the request to the appropriate method.
+     *
+     * @param request The request to route
+     * @return The response to send back to the client
+     * @throws InvocationTargetException If the target method throws an exception
+     * @throws IllegalAccessException    If the target method is inaccessible
+     */
+    public HttpResponse route(@NotNull HttpRequest request) throws InvocationTargetException, IllegalAccessException {
+        if (getType() == Type.PROXY) {
+            return proxyRoute(request);
+        } else {
+            return standardRoute(request);
+        }
     }
 
     enum Type {
@@ -194,7 +200,9 @@ public class Route {
     @Target(ElementType.METHOD)
     public @interface ProxyRoute {
         String path() default "";
+
         String target();
+
         HttpOpCode opCode() default HttpOpCode.GET;
     }
 

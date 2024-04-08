@@ -1,10 +1,11 @@
 package net.phoenix.server;
 
-import net.phoenix.server.logging.Logger;
 import net.phoenix.server.http.RequestHandler;
 import net.phoenix.server.http.reflection.Route;
 import net.phoenix.server.http.reflection.Router;
 import net.phoenix.server.http.reflection.WebHandler;
+import net.phoenix.server.logging.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -26,7 +27,7 @@ import java.util.Map;
  */
 public class Server {
 
-    public static AsynchronousServerSocketChannel socket = null;
+    public static @Nullable AsynchronousServerSocketChannel socket = null;
     public static Logger logger;
     public static Class<?> clazz;
 
@@ -53,7 +54,7 @@ public class Server {
      *
      * @return The stack trace element that called System.exit(), or null if it was not called
      */
-    private static String checkStackTrace() {
+    private static @Nullable String checkStackTrace() {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (StackTraceElement element : stackTrace) {
             if (element.getClassName().equals("java.lang.System") &&
@@ -69,7 +70,7 @@ public class Server {
      *
      * @throws IOException If the server fails to start
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "DataFlowIssue"})
     public void start() throws IOException {
         logger.logRaw("""
                 \033[38;2;0;255;0m
@@ -92,6 +93,7 @@ public class Server {
         try {
             Router.generateRoutes();
             for (Map.Entry<String, Route> entry : Router.getRoutes().entrySet()) {
+                assert entry.getValue().getMethod() != null;
                 logger.logDebug("Route: " + entry.getKey() + " -> function " + entry.getValue().getPath() + "()"
                         + " in " + entry.getValue().getMethod().getDeclaringClass().getPackageName() + entry.getValue().getMethod().getDeclaringClass().getName());
             }
@@ -104,6 +106,7 @@ public class Server {
         logger.logInfo("Registering shutdown hooks");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
+                assert socket != null;
                 socket.close();
             } catch (IOException e) {
                 logger.logError("Failed to close server socket due to: " + e.getMessage());

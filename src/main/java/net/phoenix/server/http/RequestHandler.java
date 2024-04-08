@@ -5,6 +5,7 @@ import net.phoenix.server.http.builder.HttpResponseBuilder;
 import net.phoenix.server.http.container.HttpResponse;
 import net.phoenix.server.http.processors.IncomingRequest;
 import net.phoenix.server.http.processors.IncomingRequestDecoder;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -29,7 +30,8 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
      * @param attachment The object attached to the I/O operation when it was initiated.
      */
     @Override
-    public void completed(AsynchronousSocketChannel result, Object attachment) {
+    public void completed(@NotNull AsynchronousSocketChannel result, Object attachment) {
+        assert Server.socket != null;
         if (Server.socket.isOpen()) {
             Server.socket.accept(null, this);
         }
@@ -52,7 +54,7 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
                 HttpResponse response;
                 try {
                     response = IncomingRequest.processRequest(IncomingRequestDecoder.processRequest(request, result.getRemoteAddress().toString()));
-                    if(response.responseHeaders().get("Upgrade") != null && response.responseHeaders().get("Upgrade").get(0).equals("h2c")) {
+                    if (response.responseHeaders().get("Upgrade") != null && response.responseHeaders().get("Upgrade").get(0).equals("h2c")) {
                         response = new HttpResponseBuilder().setStatusCode(505).build();
                     }
                 } catch (IOException e) {
@@ -86,7 +88,7 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
              *          The object attached to the I/O operation when it was initiated.
              */
             @Override
-            public void failed(Throwable exc, Object attachment) {
+            public void failed(@NotNull Throwable exc, Object attachment) {
                 Server.logger.logError("Failed to read request from client due to: " + exc.getMessage());
             }
         });
@@ -99,7 +101,7 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
      * @param attachment The object attached to the I/O operation when it was initiated.
      */
     @Override
-    public void failed(Throwable exc, Object attachment) {
+    public void failed(@NotNull Throwable exc, Object attachment) {
         Server.logger.logError("Failed to accept connection due to: " + exc.getMessage());
     }
 
@@ -109,9 +111,9 @@ public class RequestHandler implements CompletionHandler<AsynchronousSocketChann
      * @param socketChannel The socket channel to schedule the timeout for
      * @param timeout       The timeout duration
      */
-    private void scheduleTimeout(AsynchronousSocketChannel socketChannel, int timeout) {
+    private void scheduleTimeout(@NotNull AsynchronousSocketChannel socketChannel, int timeout) {
         executor.schedule(() -> {
-            if(!socketChannel.isOpen()) return;
+            if (!socketChannel.isOpen()) return;
             try {
                 HttpResponse timeoutResponse = new HttpResponseBuilder().setStatusCode(408).build();
                 ByteBuffer responseBuffer = ByteBuffer.wrap(timeoutResponse.toString().getBytes(StandardCharsets.UTF_8));
