@@ -1,6 +1,6 @@
 package net.phoenix.server;
 
-import net.phoenix.server.http.RequestHandler;
+import net.phoenix.server.http.http1.RequestHandler;
 import net.phoenix.server.http.reflection.Route;
 import net.phoenix.server.http.reflection.Router;
 import net.phoenix.server.http.reflection.WebHandler;

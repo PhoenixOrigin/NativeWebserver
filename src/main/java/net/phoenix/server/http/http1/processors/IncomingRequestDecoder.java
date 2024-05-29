@@ -1,4 +1,4 @@
-package net.phoenix.server.http.processors;
+package net.phoenix.server.http.http1.processors;
 
 import net.phoenix.server.http.builder.HttpRequestBuilder;
 import net.phoenix.server.http.container.HttpOpCode;

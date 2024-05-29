@@ -1,10 +1,10 @@
-package net.phoenix.server.http;
+package net.phoenix.server.http.http1;
 
 import net.phoenix.server.Server;
 import net.phoenix.server.http.builder.HttpResponseBuilder;
 import net.phoenix.server.http.container.HttpResponse;
-import net.phoenix.server.http.processors.IncomingRequest;
-import net.phoenix.server.http.processors.IncomingRequestDecoder;
+import net.phoenix.server.http.http1.processors.IncomingRequest;
+import net.phoenix.server.http.http1.processors.IncomingRequestDecoder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
